@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MemeiBokemJahanamBirthday</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,700&family=Inter:wght@300;400;500;700&family=Reenie+Beanie&display=swap" rel="stylesheet">
+    <style>
+        :root { 
+            --maroon: #3d0000; 
+            --maroon-light: #590000;
+            --gold: #c5a059; 
+            --cream: #f4e1d2; 
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--maroon); 
+            color: var(--cream); 
+            overflow: hidden; 
+            height: 100vh; 
+        }
+
+        /* Kelopak Bunga Berjatuhan */
+        .petal { 
+            position: fixed; 
+            background: #ffb7b7; 
+            border-radius: 150% 0 150% 0; 
+            z-index: 99; 
+            pointer-events: none; 
+            opacity: 0.5; 
+            animation: fall linear infinite; 
+        }
+        @keyframes fall { 
+            0% { transform: translateY(-10vh) rotate(0deg); } 
+            100% { transform: translateY(110vh) rotate(360deg); } 
+        }
+
+        /* Sistem Slide */
+        .section { 
+            height: 100vh; 
+            width: 100%; 
+            display: none; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            text-align: center; 
+            padding: 20px; 
+            position: relative;
+        }
+        .active { display: flex; }
+
+        h2 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 2rem; margin-bottom: 20px; }
+
+        /* Game 1: PIN */
+        .pin-container { background: rgba(255,255,255,0.03); padding: 35px; border-radius: 20px; border: 1px solid var(--gold); backdrop-filter: blur(10px); }
+        .dots { display: flex; gap: 15px; margin-bottom: 25px; justify-content: center; }
+        .dot { width: 12px; height: 12px; border: 1px solid var(--gold); border-radius: 50%; transition: 0.2s; }
+        .dot.active { background: var(--gold); box-shadow: 0 0 10px var(--gold); }
+        .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .key { width: 55px; height: 55px; border: 1px solid var(--gold); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: 0.3s; }
+        .key:hover { background: var(--gold); color: var(--maroon); }
+
+        /* Game 2: Suwit RPS */
+        .rps-options { display: flex; gap: 20px; margin-top: 20px; }
+        .rps-btn { font-size: 2.5rem; background: rgba(255,255,255,0.05); border: 1px solid var(--gold); border-radius: 50%; width: 70px; height: 70px; cursor: pointer; transition: 0.3s; display: flex; justify-content: center; align-items: center; }
+        .rps-btn:hover { background: var(--gold); transform: scale(1.1); }
+        .rps-status { margin-top: 20px; font-size: 1.1rem; min-height: 30px; font-weight: 500; color: #ffcd60; }
+
+        /* Game 3: Wish */
+        .cake { font-size: 5rem; margin-bottom: 20px; animation: float 3s infinite ease-in-out; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+
+        /* Jeda Animasi Teks */
+        .typing-text { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-style: italic; color: var(--gold); border-right: 2px solid var(--gold); white-space: nowrap; overflow: hidden; width: 0; }
+        .typing-active { animation: typing 2.2s steps(30, end) forwards, blink 0.5s step-end infinite; }
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink { from, to { border-color: transparent } 50% { border-color: var(--gold); } }
+
+        /* Auto Polaroid Slide */
+        .polaroid-box { background: white; padding: 15px 15px 50px 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); width: 280px; transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .polaroid-box img { width: 100%; height: 250px; object-fit: cover; }
+        .caption { font-family: 'Reenie Beanie', cursive; color: #333; font-size: 1.8rem; margin-top: 15px; }
+
+        /* KOTAK SURAT 3D PREMIUM */
+        .envelope-wrapper { position: relative; width: 350px; height: 220px; margin-top: 40px; }
+        .envelope { position: absolute; bottom: 0; width: 100%; height: 100%; background: var(--maroon-light); border-radius: 8px; box-shadow: 0 15px 35px rgba(0,0,0,0.5); border: 1px solid rgba(197, 160, 89, 0.3); z-index: 2; overflow: hidden; }
+        .envelope::before { content: ''; position: absolute; top: 0; left: 0; width: 0; height: 0; border-left: 175px solid transparent; border-right: 175px solid transparent; border-top: 115px solid #6b0000; transform-origin: top; transition: transform 0.6s ease; z-index: 4; }
+        .letter { position: absolute; bottom: 10px; left: 15px; width: 320px; height: 190px; background: #faf4ee; color: #222; padding: 30px 25px; z-index: 1; transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), height 0.8s; text-align: left; font-size: 0.85rem; line-height: 1.6; border-radius: 4px; box-shadow: inset 0 0 10px rgba(0,0,0,0.05); }
+        
+        .envelope-wrapper.open::before { transform: rotateX(180deg); z-index: 0; }
+        .envelope-wrapper.open .letter { transform: translateY(-160px); height: 325px; z-index: 3; box-shadow: 0 -5px 20px rgba(0,0,0,0.3); }
+
+        /* SECTION MEMORI AKHIR (VIDEO & FOTO) */
+        .memories-grid { display: flex; flex-direction: column; align-items: center; gap: 20px; max-width: 900px; width: 100%; }
+        .video-player { width: 100%; max-width: 500px; border-radius: 12px; border: 2px solid var(--gold); box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
+        .photos-row { display: flex; gap: 15px; justify-content: center; width: 100%; margin-top: 10px; }
+        .mini-polaroid { background: white; padding: 8px 8px 20px 8px; width: 110px; box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+        .mini-polaroid img { width: 100%; height: 90px; object-fit: cover; }
+
+        /* Jari Tengah Shake Animation */
+        .middle-finger { font-size: 7rem; margin-bottom: 20px; animation: shake 0.4s infinite; display: inline-block; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(2px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(2px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .btn { margin-top: 40px; background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px 30px; cursor: pointer; letter-spacing: 2px; text-transform: uppercase; font-size: 0.7rem; transition: 0.3s; z-index: 10; }
+        .btn:hover { background: var(--gold); color: var(--maroon); }
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop><source src="music2.mp3" type="audio/mpeg"></audio>
+    <div id="petals"></div>
+
+    <!-- [GAME 1]: PIN HP -->
+    <section class="section active" id="sec1">
+        <div class="pin-container">
+            <p style="letter-spacing: 3px; font-size: 0.7rem; margin-bottom: 20px; opacity: 0.8;">SELAMAT DATANG JAHANAM MASUKIN KODENYA NYAK, HINT HARI INI...</p>
+            <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            <div class="keypad">
+                <div class="key" onclick="addPin(1)">1</div><div class="key" onclick="addPin(2)">2</div><div class="key" onclick="addPin(3)">3</div>
+                <div class="key" onclick="addPin(4)">4</div><div class="key" onclick="addPin(5)">5</div><div class="key" onclick="addPin(6)">6</div>
+                <div class="key" onclick="addPin(7)">7</div><div class="key" onclick="addPin(8)">8</div><div class="key" onclick="addPin(9)">9</div>
+                <span></span><div class="key" onclick="addPin(0)">0</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- [GAME 2]: SUWIT BATU GUNTING KERTAS -->
+    <section class="section" id="sec2">
+        <h2>️C'MON GAME TWOO</h2>
+        <p style="font-size: 0.85rem; opacity: 0.7;">Kalo kalah chat sangit ya kemm.</p>
+        <div class="rps-options">
+            <button class="rps-btn" onclick="playSuwit('✊')">✊</button>
+            <button class="rps-btn" onclick="playSuwit('✌️')">✌️</button>
+            <button class="rps-btn" onclick="playSuwit('✋')">✋</button>
+        </div>
+        <div class="rps-status" id="suwitStatus">PILIH SATU AJE PRUY...</div>
+    </section>
+
+    <!-- [GAME 3]: MAKE A WISH -->
+    <section class="section" id="sec3">
+        <div class="cake">🎂</div>
+        <h2>Make a Wish...</h2>
+        <p style="font-size: 0.85rem; font-style: italic; opacity: 0.7;">CEPET DOAA, YANG BAIK BAIK.</p>
+        <button class="btn" onclick="triggerIntermission('secIntermission', 4)">Aminnn</button>
+    </section>
+
+    <!-- [JEDA ANIMASI 1]: SEBELUM FOTO -->
+    <section class="section" id="secIntermission" style="background-color: #120000;">
+        <div class="typing-text" id="typeText">MARI KITA SAKSIKAN...</div>
+    </section>
+
+    <!-- [SLIDE FOTO]: AUTO-SLIDE POLAROID (5 FOTO, 2 DETIK) -->
+    <section class="section" id="sec4">
+        <div class="polaroid-box" id="polBox">
+            <img src="memei1.jpg" id="slideImg">
+            <p class="caption" id="slideCap">Inilah dia...</p>
+        </div>
+        <button class="btn" onclick="next(5)">lanjott kita masuk ke yang sweet dulu kali yee</button>
+    </section>
+
+    <!-- [KOTAK SURAT]: PREMIUM 3D ENVELOPE -->
+    <section class="section" id="sec5">
+        <h2>A Message For You</h2>
+        <div class="envelope-wrapper" id="envelopeWrap" onclick="openEnvelope()">
+            <div class="envelope"></div>
+            <div class="letter">
+                <b style="font-family: 'Playfair Display'; font-size: 1.1rem; color: var(--maroon);">Happy Birthday!</b><br><br>
+                happy 16th birthday to my bokem and jahanam friend, Memei. tahun depan udah sweetseventen aja nih mei, semoga tahun tahun berikutnya gua bisa tetep bikinin lu kaya gini bahkan lebih lebih bagus daripada ini yaaa. and..I hope you'll always surrendered. by love and happiness I hope this year brings you everything you have ever wished for. I'll always be proud of what you've done and will do having in my life feels blessing every day. 🥳
+                <br><br>
+                <i style="font-family: 'Reenie Beanie'; font-size: 1.6rem; float: right;">— sahabattiljannah</i>
+            </div>
+        </div>
+        <button class="btn" id="finalBtn" style="display:none; margin-top: 180px;" onclick="next(6)">Our Memories →</button>
+    </section>
+
+    <!-- [SECTION AKHIR]: MEMORI KITA (VIDEO & FOTO) -->
+    <section class="section" id="sec6">
+        <h2>Our Memories ✨</h2>
+        <div class="memories-grid">
+            <video class="video-player" id="memoriVideo" controls loop>
+                <source src="memori.mp4" type="video/mp4">
+            </video>
+            
+            <div class="photos-row">
+                <div class="mini-polaroid" style="transform: rotate(-6deg);"><img src="kita1.jpg"></div>
+                <div class="mini-polaroid" style="transform: rotate(4deg);"><img src="kita2.jpg"></div>
+                <div class="mini-polaroid" style="transform: rotate(-3deg);"><img src="kita3.jpg"></div>
+            </div>
+        </div>
+        <button class="btn" onclick="triggerIntermission('secLastIntermission', 7)">Selesai</button>
+    </section>
+
+    <!-- [JEDA ANIMASI 2]: SLIDE TULISAN "LAST..." -->
+    <section class="section" id="secLastIntermission" style="background-color: #0d0000;">
+        <div class="typing-text" id="typeLastText" style="font-size: 2rem; font-weight: bold; letter-spacing: 5px;">Last....</div>
+    </section>
+
+    <!-- [SLIDE PLOT TWIST]: SLIDE JARI TENGAH -->
+    <section class="section" id="sec7" style="background-color: #050000;">
+        <div class="middle-finger">🖕</div>
+        <h2 style="color: #ff4d4d; font-family: 'Inter'; font-weight: 700;">HBD LAGI BOKEM WAKAKKA!</h2>
+        <p style="font-size: 0.9rem; opacity: 0.8; max-width: 400px; line-height: 1.5;">Mungkin ini ga terlalu kena di lu, tapi semoga lu suka ya dulll. Doa terbaik buat lu! 😂</p>
+    </section>
+
+    <script>
+        const correctPin = "1505"; // PIN depan
+
+        const listFoto = [
+            { src: 'memei1.jpg', caption: 'janji terakhir?...', rotasi: '-5deg' },
+            { src: 'memei2.jpg', caption: 'Orang jeleknya PAKUJAYA', rotasi: '5deg' },
+            { src: 'memei3.jpg', caption: 'Elehhh elehhh', rotasi: '-2deg' },
+            { src: 'memei4.jpg', caption: 'Duh banyak ya wakk', rotasi: '4deg' },
+            { src: 'memei5.jpg', caption: 'yukk udah yukk', rotasi: '-4deg' }
+        ];
+
+        const music = document.getElementById('bgMusic');
+        let currentPin = "";
+
+        // Efek Bunga Gugur
+        setInterval(() => {
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.width = petal.style.height = (Math.random() * 10 + 10) + 'px';
+            petal.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            document.getElementById('petals').appendChild(petal);
+            setTimeout(() => petal.remove(), 5000);
+        }, 300);
+
+        // Game 1: PIN
+        function addPin(num) {
+            if(currentPin.length < 4) {
+                currentPin += num;
+                document.querySelectorAll('.dot')[currentPin.length-1].classList.add('active');
+                if(currentPin === correctPin) {
+                    music.play();
+                    setTimeout(() => next(2), 500);
+                } else if(currentPin.length === 4) {
+                    setTimeout(() => {
+                        currentPin = "";
+                        document.querySelectorAll('.dot').forEach(d => d.classList.remove('active'));
+                    }, 500);
+                }
+            }
+        }
+
+        // Game 2: Logika Suwit (Batu Gunting Kertas)
+        function playSuwit(pilihanUser) {
+            const opsi = ['✊', '✌️', '✋'];
+            const pilihanAI = opsi[Math.floor(Math.random() * 3)];
+            const status = document.getElementById('suwitStatus');
+            
+            if (pilihanUser === pilihanAI) {
+                status.innerText = `Kamu: ${pilihanUser} vs AI: ${pilihanAI} (Seri! Ulangi)`;
+            } else if (
+                (pilihanUser === '✊' && pilihanAI === '✌️') ||
+                (pilihanUser === '✌️' && pilihanAI === '✋') ||
+                (pilihanUser === '✋' && pilihanAI === '✊')
+            ) {
+                status.innerHTML = `Bokem: ${pilihanUser} vs Antekaseng: ${pilihanAI} <br><span style="color:#4dff4d;">Yelah menang die, yaudeh lanjut dah...</span>`;
+                setTimeout(() => { next(3); }, 1500);
+            } else {
+                status.innerText = `Bokem: ${pilihanUser} vs Antekaseng: ${pilihanAI} (YANG BENER KOCAK, ULANG!)`;
+            }
+        }
+
+        // Fungsi Membuka Jeda Layar Animasi Typing Teks
+        function triggerIntermission(targetSec, nextId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(targetSec).classList.add('active');
+            
+            const txt = targetSec === 'secIntermission' ? document.getElementById('typeText') : document.getElementById('typeLastText');
+            txt.classList.add('typing-active');
+            
+            setTimeout(() => {
+                next(nextId);
+            }, 3000);
+        }
+
+        // Jalur Slide Navigasi Utama
+        function next(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById('sec'+id).classList.add('active');
+            if(id === 4) startSlide();
+            if(id === 6) document.getElementById('memoriVideo').play();
+        }
+
+        // Efek Bukaan Surat Modern
+        function openEnvelope() {
+            const env = document.getElementById('envelopeWrap');
+            env.classList.toggle('open');
+            const btn = document.getElementById('finalBtn');
+            if(env.classList.contains('open')) {
+                setTimeout(() => { btn.style.display = 'inline-block'; }, 800);
+            } else {
+                btn.style.display = 'none';
+            }
+        }
+
+        // Auto Polaroid Slider (2 Detik!)
+        function startSlide() {
+            let index = 0;
+            setInterval(() => {
+                index = (index + 1) % listFoto.length;
+                const box = document.getElementById('polBox');
+                box.style.opacity = '0';
+                box.style.transform = 'scale(0.85)';
+                setTimeout(() => {
+                    document.getElementById('slideImg').src = listFoto[index].src;
+                    document.getElementById('slideCap').innerText = listFoto[index].caption;
+                    box.style.transform = `rotate(${listFoto[index].rotasi}) scale(1)`;
+                    box.style.opacity = '1';
+                }, 400);
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
